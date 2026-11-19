@@ -36,6 +36,34 @@ When the wizard asks to add your data, choose **PostgreSQL** and enter:
 Use `postgres` as the host, not `localhost`: Metabase reaches the database over
 the Compose network.
 
+## Sample data: IBM HR Attrition
+
+The [IBM HR Analytics Employee Attrition](https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset)
+dataset (1,470 fictional employees, 35 columns) is in `data/`. Load it with:
+
+```sh
+./scripts/load-attrition.sh
+```
+
+The script needs the containers running. It recreates the data each time, so it
+is safe to re-run. It creates:
+
+- **`employee_attrition`**: the raw CSV, columns renamed to `snake_case`, and
+  `Yes`/`No` columns stored as booleans.
+- **`employees`**: a view over that table with the 1–4 / 1–5 survey codes
+  turned into labels (e.g. job satisfaction `Low` … `Very High`) and the
+  constant columns left out. Use this one in Metabase.
+
+The table and view are defined in `sql/attrition.sql`. To fetch the CSV again:
+
+```sh
+curl -L -o /tmp/attrition.zip https://www.kaggle.com/api/v1/datasets/download/pavansubhasht/ibm-hr-analytics-attrition-dataset
+unzip -o -d data /tmp/attrition.zip
+```
+
+After loading, have Metabase pick up the new tables:
+**Admin → Databases → (your database) → Sync database schema now**.
+
 ## Connecting from your machine
 
 Use `localhost:5432` with the same credentials, for example:
